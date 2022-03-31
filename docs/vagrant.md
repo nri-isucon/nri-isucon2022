@@ -15,8 +15,8 @@
 競技VMをVagrantコマンドを使って起動します。
 
 ```shell
-(nri-isucon2022)$ cd provisioning/vagrant
-(nri-isucon2022/provisioning/vagrant)$ vagrant up
+(nri-isucon2022)$ cd provisioning
+(nri-isucon2022/provisioning)$ vagrant up
 
 ...(省略)...
 
