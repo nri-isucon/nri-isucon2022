@@ -1,0 +1,27 @@
+- name: Remove provisioning file
+  become: yes
+  become_user: root
+  file:
+    path: "/home/isucon/isubnb/{{ item }}"
+    state: absent
+  with_items:
+    - .git
+    - LICENSE
+    - README.md
+    - initial-data
+    - benchmark
+    - docs
+    - provisioning
+    - webapp/frontend
+    - webapp/backend/go/.gitignore
+    - webapp/backend/java/.gitignore
+    - webapp/backend/python/.gitignore
+    - webapp/backend/mysql/.gitignore
+
+- name: Remove Ansible Temporary Directory
+  become: yes
+  become_user: root
+  file:
+    path: "/home/isucon/.ansible"
+    state: absent
+    

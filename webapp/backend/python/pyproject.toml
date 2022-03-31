@@ -1,0 +1,20 @@
+[tool.poetry]
+name = "isubnb"
+version = "0.1.0"
+description = "pythonによる参考実装"
+authors = ["a-kumasaki"]
+
+[tool.poetry.dependencies]
+python = "3.8.6"
+Flask = "^1.1.2"
+gunicorn = "^20.0.4"
+mysql-connector-python = "^8.0.22"
+requests = "^2.26.0"
+
+[tool.poetry.dev-dependencies]
+autopep8 = "^1.5.4"
+flake8 = "^3.8.4"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"

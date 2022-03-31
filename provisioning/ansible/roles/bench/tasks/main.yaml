@@ -1,0 +1,35 @@
+- name: Check Directory ~/isubnb/bench
+  become: yes
+  become_user: root
+  stat:
+    path: &benchDir "/home/isucon/isubnb/bench"
+  register: chk_file
+
+- name: Delete Directory ~/isubnb/bench if exists
+  become: yes
+  become_user: root
+  file:
+    path: *benchDir
+    state: absent
+  when: chk_file.stat.exists
+
+- name: Make Directory ~/isubnb/bench
+  become: yes
+  become_user: isucon
+  file: 
+    path: /home/isucon/isubnb/bench
+    state: directory
+
+- name: Deploy benchmarker
+  become: yes
+  become_user: isucon
+  command: cp /home/isucon/isubnb/benchmark/linux-amd64/benchmarker /home/isucon/isubnb/bench/benchmarker
+
+- name: Copy Initial Data
+  become: yes
+  become_user: isucon
+  synchronize:
+    src: /home/isucon/isubnb/initial-data
+    dest: /home/isucon/isubnb/bench
+  delegate_to: "{{ inventory_hostname }}"
+  

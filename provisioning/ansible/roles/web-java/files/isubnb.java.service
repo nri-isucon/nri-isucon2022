@@ -1,0 +1,18 @@
+[Unit]
+Description=isubnb.java
+
+[Service]
+WorkingDirectory=/home/isucon/isubnb/webapp/backend/java
+EnvironmentFile=/home/isucon/env.sh
+PIDFile=/home/isucon/isubnb/webapp/backend/java/server.pid
+
+User=isucon
+Group=isucon
+ExecStart=/home/isucon/isubnb/webapp/backend/java/target/isubnb-0.0.1.jar -Xms512m
+SuccessExitStatus=143
+
+Restart   = always
+Type      = simple
+
+[Install]
+WantedBy=multi-user.target

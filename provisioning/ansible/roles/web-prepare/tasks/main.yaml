@@ -1,0 +1,23 @@
+---
+- name: Start "isubnb.go.service"
+  systemd:
+    daemon_reload: "yes"
+    name: "isubnb.go.service"
+    state: "restarted"
+    enabled: "yes"
+
+- name: Start "nginx"
+  systemd:
+    daemon_reload: "yes"
+    name: "nginx"
+    state: "reloaded"
+    enabled: "yes"
+
+- name: Initialize isubnb
+  uri:
+    url: http://localhost/api/v1/initialize
+    method: POST
+    body: '{ "reservable_days": 30}'
+    body_format: json
+    headers:
+      Content-Type: "application/json"

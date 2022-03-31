@@ -1,0 +1,17 @@
+[Unit]
+Description=isubnb.python
+After=syslog.target
+
+[Service]
+WorkingDirectory=/home/isucon/isubnb/webapp/backend/python
+EnvironmentFile=/home/isucon/env.sh
+PIDFile=/home/isucon/isubnb/webapp/backend/python/server.pid
+
+User=isucon
+Group=isucon
+ExecStart=/home/isucon/local/python/bin/gunicorn --workers=4 --threads=4 app:app -b ':1323'
+
+Restart   = always
+Type      = simple
+[Install]
+WantedBy=multi-user.target

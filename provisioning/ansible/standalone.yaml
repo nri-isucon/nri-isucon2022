@@ -1,0 +1,14 @@
+- hosts: all
+  become: yes
+  become_user: root
+  roles:
+    - role: common
+    - role: langs
+    - role: web-bootstrap
+    - role: web-frontend
+    - role: web-go
+    - role: web-python
+    - role: web-java
+    - role: web-prepare
+    - role: bench
+    - role: remove

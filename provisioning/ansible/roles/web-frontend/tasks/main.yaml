@@ -1,0 +1,26 @@
+- name: Check Directory /www/data
+  become: yes
+  become_user: root
+  stat:
+    path: &wwwDir "/www"
+  register: chk_file
+
+- name: Delete Directory /www if exists
+  become: yes
+  become_user: root
+  file:
+    path: *wwwDir
+    state: absent
+  when: chk_file.stat.exists
+
+- name: Make Directory /www
+  become: yes
+  become_user: root
+  file: 
+    path: *wwwDir
+    state: directory
+
+- name: Deploy static files
+  become: yes
+  become_user: root
+  command: cp -r /home/isucon/isubnb/webapp/frontend/public/ /www/data/

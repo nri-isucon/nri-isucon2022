@@ -1,0 +1,9 @@
+---
+- name: "include user.yaml"
+  include: user.yaml
+- name: "include timezone.yaml"
+  include: timezone.yaml
+- name: "include sysctl.yaml"
+  include: sysctl.yaml
+- name: "include package.yaml"
+  include: package.yaml

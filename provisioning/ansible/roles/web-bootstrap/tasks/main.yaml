@@ -1,0 +1,158 @@
+---
+- name: Check Directory ~/isubnb
+  become: yes
+  become_user: root
+  stat:
+    path: &workDir "/home/isucon/isubnb"
+  register: chk_file
+
+- name: Delete Directory ~/isubnb if exists
+  become: yes
+  become_user: root
+  file:
+    path: *workDir
+    state: absent
+  when: chk_file.stat.exists
+
+- name: Git Clone
+  become: yes
+  become_user: isucon
+  git:
+    repo: https://github.com/nri-isucon/nri-isucon2022.git
+    version: main
+    dest: "/home/isucon/isubnb"
+
+- name: Upgrade pip
+  environment: &env
+    PATH: "/home/isucon/local/go/bin:/home/isucon/local/node/bin:/home/isucon/local/python/bin:/home/isucon/bin:/home/isucon/.local/bin:/usr/bin:/sbin:/bin"
+  pip:
+    name: pip
+    executable: pip3
+    state: latest
+
+- name: Deploy nginx.conf
+  copy:
+    src: "nginx.conf"
+    dest: "/etc/nginx/nginx.conf"
+    owner: "root"
+    group: "root"
+    mode: "0644"
+
+- name: Deploy nginx isubnb.conf
+  copy:
+    src: "isubnb.conf"
+    dest: "/etc/nginx/sites-available/isubnb.conf"
+    owner: "root"
+    group: "root"
+    mode: "0644"
+
+- name: Enable isubnb.config
+  file:
+    path: /etc/nginx/sites-enabled/isubnb.conf
+    src: /etc/nginx/sites-available/isubnb.conf
+    state: link
+
+- name: Delete default config
+  file:
+    path: /etc/nginx/sites-enabled/default
+    state: absent
+
+- name: Install Package(MYSQL)
+  become: yes
+  become_user: root
+  apt:
+    name:
+    - mysql-server-5.7
+    - mysql-server-core-5.7
+    - mysql-common
+    - mysql-client-5.7
+    - mysql-client-core-5.7
+    - libmysqld-dev
+    update_cache: yes
+
+- name: Set Temporary password
+  become: yes
+  become_user: root
+  blockinfile:
+    create: yes
+    dest: &myCnf /root/.my.cnf
+    content: |
+      [client]
+      user = root
+      password = root
+
+- name: Create isucon user on MySQL
+  become: yes
+  become_user: root
+  shell: |
+      mysql --defaults-extra-file=/root/.my.cnf -e "CREATE USER isucon@localhost IDENTIFIED BY 'isucon';"
+      mysql --defaults-extra-file=/root/.my.cnf -e "GRANT ALL PRIVILEGES ON *.* TO isucon@localhost WITH GRANT OPTION;"
+      mysql --defaults-extra-file=/root/.my.cnf -e "FLUSH PRIVILEGES;"
+
+- name: Remove Temporary file
+  become: yes
+  become_user: root
+  file:
+    path: *myCnf
+    state: absent
+
+- name: Copy mysqld.conf
+  become: yes
+  become_user: root
+  copy:
+    src: "mysqld.cnf"
+    dest: "/etc/mysql/mysql.conf.d/mysqld.cnf"
+    owner: "root"
+    group: "root"
+    mode: "0644"
+
+- name: Copy my.conf
+  become: yes
+  become_user: root
+  copy:
+    src: "my.cnf"
+    dest: "/etc/mysql/conf.d/my.cnf"
+    owner: "root"
+    group: "root"
+    mode: "0644"
+
+- name: Install poetry
+  become: yes
+  become_user: root
+  environment:
+    <<: *env
+  pip:
+    executable: pip3
+    name: poetry
+
+- name: Deploy Initial Data
+  become: yes
+  become_user: isucon
+  synchronize:
+    src: /home/isucon/isubnb/initial-data/
+    dest: /home/isucon/isubnb/webapp/backend/mysql/data
+  delegate_to: "{{ inventory_hostname }}"
+
+- name: Restart "mysql"
+  systemd:
+    daemon_reload: "yes"
+    name: "mysql"
+    state: "restarted"
+    enabled: "yes"
+
+- name: Setup MySQL
+  become: yes
+  become_user: isucon
+  args:
+    chdir: /home/isucon/isubnb
+  environment:
+    <<: *env
+  shell: |
+    mysql -u isucon -pisucon < webapp/backend/mysql/db/0_Schema.sql
+
+- name: Deploy env shellscript
+  become: yes
+  become_user: isucon
+  copy:
+    src: "env.sh"
+    dest: /home/isucon

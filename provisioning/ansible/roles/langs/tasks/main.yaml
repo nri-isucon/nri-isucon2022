@@ -1,0 +1,29 @@
+---
+- name: Install Go 1.15.6
+  become: yes
+  become_user: isucon
+  command: /tmp/xbuild/go-install 1.15.6 /home/isucon/local/go
+
+- name: Add PATH for Go
+  become: yes
+  become_user: isucon
+  blockinfile:
+    marker: "# {mark} ANSIBLE MANAGED BLOCK go"
+    path: /home/isucon/.bashrc
+    content: |
+      export PATH=/home/isucon/local/go/bin:/home/isucon/go/bin:$PATH
+      export GOROOT=/home/isucon/local/go
+
+- name: Install python v3.8.6
+  become: yes
+  become_user: isucon
+  command: /tmp/xbuild/python-install 3.8.6 /home/isucon/local/python
+
+- name: Add PATH for python
+  become: yes
+  become_user: isucon
+  blockinfile:
+    marker: "# {mark} ANSIBLE MANAGED BLOCK python"
+    path: /home/isucon/.bashrc
+    content: |
+      export PATH=/home/isucon/local/python/bin:$PATH
