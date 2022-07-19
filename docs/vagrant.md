@@ -53,7 +53,7 @@ $ sudo su - isucon
 ベンチマークは、以下のコマンドで実行できます。
 
 ```shell
-$ TARGET_PORT=80 TargetIpAddr=127.0.0.1 DATA_PATH=/home/isucon/isubnb/bench/initial-data /home/isucon/isubnb/bench/benchmarker
+$ TARGET_PORT=80 TARGET_IP_ADDR=127.0.0.1 DATA_PATH=/home/isucon/isubnb/bench/initial-data /home/isucon/isubnb/bench/benchmarker
 ```
 
 ベンチマークの実行結果のサンプルは以下のとおりです。
